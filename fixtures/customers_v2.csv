@@ -1,0 +1,7 @@
+customer_id,name,age,city,country,active
+C001,Alice,34,Berlin,DE,yes
+C003,Carol,,Marseille,FR,no
+C004,Dan,29,Berlin,DE,yes
+C005,Eve,unknown,Madrid,ES,no
+C006,Frank,52,Rome,IT,no
+C007,Grace,27,Vienna,AT,yes

@@ -1,0 +1,8 @@
+customer_id,name,age,city,signup_date,active
+C001,Alice,34,Berlin,2023-01-15,yes
+C002,Bob,41,Paris,2023-02-20,yes
+C003,Carol,,Lyon,2023-03-05,no
+C004,Dan,29,Berlin,2023-04-11,yes
+C005,Eve,unknown,Madrid,2023-05-30,yes
+C006,Frank,52,Rome,2023-06-14,no
+C006,Frank,52,Rome,2023-06-14,no
