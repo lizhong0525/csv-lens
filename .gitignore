@@ -10,3 +10,5 @@ venv/
 *.diff.html
 demo_*.html
 demo_*.json
+report.html
+summary.json

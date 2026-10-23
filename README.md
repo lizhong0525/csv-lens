@@ -4,6 +4,8 @@ A local-first, zero-dependency (Python stdlib only) command-line tool that profi
 
 ## Quickstart
 
+Run from the repository root (no install step; the module is imported from the working directory):
+
 ```bash
 python -m csv_lens profile fixtures/customers_v1.csv --html report.html --json summary.json
 ```
@@ -32,8 +34,10 @@ The diff prints a console summary like:
 ```
 Schema: +1 columns ['country'] -1 columns ['signup_date'] reordered=False
 Rows (key 'customer_id'): 1 added, 1 removed, 2 cells changed
+  duplicate keys: old=['C006'] new=[]
   C003 | city: 'Lyon' -> 'Marseille'
   C005 | active: 'yes' -> 'no'
+  warning: Duplicate key values detected; for duplicated keys the LAST row in each file is used for change detection.
 ```
 
 ## Features
