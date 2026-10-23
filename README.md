@@ -74,7 +74,7 @@ python -m csv_lens diff OLD.csv NEW.csv --key COLUMN [--delimiter D] [--encoding
 python -m pytest -q        # or: python -m unittest discover -v
 ```
 
-37 tests covering loading edge cases, profiling rules, diffing, HTML/JSON report generation (including HTML-escaping of data values), and the CLI end to end. Fully deterministic, no network.
+42 tests covering loading edge cases, profiling rules, diffing, HTML/JSON report generation (including HTML-escaping of data values), and the CLI end to end. Fully deterministic, no network.
 
 ## Known limitations
 

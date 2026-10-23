@@ -119,6 +119,13 @@ def _cmd_diff(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Never crash on characters the console encoding cannot represent
+    # (e.g. emoji in headers on a legacy Windows code page); show instead.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, OSError):
+            pass
     args = build_parser().parse_args(argv)
     try:
         if args.command == "profile":

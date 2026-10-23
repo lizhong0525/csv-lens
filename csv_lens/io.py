@@ -55,7 +55,9 @@ def _decode(raw: bytes, encoding: str | None) -> tuple[str, str, bool, int]:
     if encoding:
         try:
             return raw.decode(encoding), encoding, False, 0
-        except UnicodeDecodeError as exc:
+        except LookupError:
+            raise CsvLensError(f"Unknown encoding: '{encoding}'") from None
+        except UnicodeDecodeError:
             text = raw.decode(encoding, errors="replace")
             replaced = text.count("�")
             return text, encoding, False, replaced or 1
@@ -72,8 +74,10 @@ def _decode(raw: bytes, encoding: str | None) -> tuple[str, str, bool, int]:
 def load_csv(path: str, delimiter: str | None = None,
              encoding: str | None = None) -> LoadedCsv:
     """Load a CSV file into memory without modifying any value."""
-    if not os.path.isfile(path):
+    if not os.path.exists(path):
         raise CsvLensError(f"File not found: {path}")
+    if not os.path.isfile(path):
+        raise CsvLensError(f"Not a regular file: {path}")
     with open(path, "rb") as fh:
         raw = fh.read()
     if not raw:
@@ -84,8 +88,17 @@ def load_csv(path: str, delimiter: str | None = None,
         raise CsvLensError(f"File contains no data rows: {path}")
 
     delim = delimiter or sniff_delimiter(text[:SNIFF_SAMPLE_BYTES])
+    if len(delim) != 1:
+        raise CsvLensError(
+            f"Delimiter must be a single character, got {delim!r}.")
     reader = csv.reader(io.StringIO(text), delimiter=delim)
-    records = [rec for rec in reader if rec and any(c.strip() for c in rec)]
+    try:
+        records = [rec for rec in reader if rec and any(c.strip() for c in rec)]
+    except csv.Error as exc:
+        raise CsvLensError(
+            f"Could not parse {path} as CSV: {exc}. "
+            f"Check that '{delim}' is the right delimiter "
+            f"(override with --delimiter).") from None
     if not records:
         raise CsvLensError(f"File contains no parseable rows: {path}")
 

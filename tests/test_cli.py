@@ -74,6 +74,52 @@ class TestCli(unittest.TestCase):
         self.assertEqual(r.returncode, 2)
         self.assertIn("not found", r.stderr)
 
+    def test_unknown_encoding_clean_error(self):
+        r = run_cli("profile", str(FIXTURES / "customers_v1.csv"),
+                    "--encoding", "bogus-enc")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("Unknown encoding", r.stderr)
+        self.assertNotIn("Traceback", r.stderr)
+
+    def test_multi_char_delimiter_clean_error(self):
+        r = run_cli("profile", str(FIXTURES / "customers_v1.csv"),
+                    "--delimiter", ";;")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("single character", r.stderr)
+        self.assertNotIn("Traceback", r.stderr)
+
+    def test_directory_instead_of_file(self):
+        r = run_cli("profile", str(FIXTURES))
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("Not a regular file", r.stderr)
+        self.assertNotIn("Traceback", r.stderr)
+
+    def test_oversized_field_clean_error(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "big.csv")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("a,b\n" + "x" * 200000 + ",y\n")
+            r = run_cli("profile", path)
+            self.assertEqual(r.returncode, 2)
+            self.assertIn("Could not parse", r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+
+    def test_console_output_survives_unencodable_chars(self):
+        # Simulate a legacy-codepage console (e.g. Windows GBK) where data
+        # contains characters the output encoding cannot represent.
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "emoji.csv")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("id,备注🌍\n1,x\n2,y\n")
+            env = dict(os.environ, PYTHONIOENCODING="gbk:strict")
+            r = subprocess.run(
+                [sys.executable, "-m", "csv_lens", "profile", path,
+                 "--html", os.path.join(td, "r.html")],
+                cwd=str(ROOT), capture_output=True, text=True,
+                encoding="utf-8", errors="replace", env=env, timeout=60)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertNotIn("Traceback", r.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
