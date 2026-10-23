@@ -4,7 +4,7 @@ A local-first, zero-dependency (Python stdlib only) command-line tool that profi
 
 ## Quickstart
 
-Run from the repository root (no install step; the module is imported from the working directory):
+Requires Python 3.10+ (tested on 3.10–3.13 in CI). No dependencies, no install step — run from the repository root so the module is importable from the working directory:
 
 ```bash
 python -m csv_lens profile fixtures/customers_v1.csv --html report.html --json summary.json
